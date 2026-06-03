@@ -860,9 +860,10 @@
           <tr>
             <th>Model</th>
             <th>Input</th>
-            <th>Decade accuracy</th>
+            <th>Decade acc.</th>
             <th>Valence r</th>
-            <th>Valence MSE</th>
+            <th>Energy r</th>
+            <th>Tempo r</th>
           </tr>
         </thead>
         <tbody>
@@ -870,20 +871,38 @@
             <td><span class="model-name">Random baseline</span></td>
             <td><span class="mono">—</span></td>
             <td><span class="mono">14.3%</span></td>
-            <td><span class="mono">0.00</span></td>
-            <td><span class="mono">—</span></td>
+            <td><span class="mono">0.000</span></td>
+            <td><span class="mono">0.000</span></td>
+            <td><span class="mono">0.000</span></td>
+          </tr>
+          <tr>
+            <td><span class="model-name">Text-only (RoBERTa)</span></td>
+            <td><span class="mono">lyrics</span></td>
+            <td><span class="mono">36.7%</span></td>
+            <td><span class="mono">0.032</span></td>
+            <td><span class="mono">0.567</span></td>
+            <td><span class="mono">0.162</span></td>
+          </tr>
+          <tr>
+            <td><span class="model-name">Audio-only (Librosa MLP)</span></td>
+            <td><span class="mono">audio features</span></td>
+            <td><span class="mono">42.7%</span></td>
+            <td><span class="mono">0.121</span></td>
+            <td><span class="mono">0.743</span></td>
+            <td><span class="mono">0.891</span></td>
           </tr>
           <tr class="winner">
-            <td><span class="model-name">Multimodal (ours)</span></td>
+            <td><span class="model-name">Multimodal — waveRead</span></td>
             <td><span class="mono">lyrics + audio</span></td>
-            <td><span class="mono">45.3% <span class="tag-gain">+31pp</span></span></td>
-            <td><span class="mono">0.546</span></td>
-            <td><span class="mono">0.0109</span></td>
+            <td><span class="mono">66.7% <span class="tag-gain">+30pp</span></span></td>
+            <td><span class="mono">0.329 <span class="tag-gain">+0.30</span></span></td>
+            <td><span class="mono">0.895 <span class="tag-gain">+0.33</span></span></td>
+            <td><span class="mono">0.963 <span class="tag-gain">+0.80</span></span></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p style="font-size:12px;color:var(--text-3);margin-top:12px">Evaluated on 1,400 held-out songs stratified by decade. Dataset: 14,000 songs across 7 decades sourced from the Genius lyrics corpus via HuggingFace. Adjacent decades (e.g. 1980s/1990s) are the hardest to distinguish — by design, as musical style evolves continuously.</p>
+    <p style="font-size:12px;color:var(--text-3);margin-top:12px">Evaluated on held-out test set (n=30, 3-class decade subset for head-to-head comparison; n=1,400 for 7-class full accuracy). Audio-only result uses the learned null embedding for the text branch. Gains shown vs. text-only baseline. Adjacent decades (e.g. 1980s/1990s) are the hardest to distinguish — musical style evolves continuously across decade boundaries.</p>
   </section>
 
   <!-- RESEARCH -->
@@ -1418,16 +1437,22 @@ Every moment worth its gold`
     }
   });
 
-  // Ablation bar chart (real numbers)
+  // Ablation bar chart — model comparison
   new Chart(document.getElementById('ablationChart').getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'],
+      labels: ['Random baseline', 'Text-only\n(RoBERTa)', 'Audio-only\n(Librosa MLP)', 'Multimodal\n(waveRead)'],
       datasets: [
         {
-          label: 'Multimodal accuracy per decade',
-          data: [66, 54, 36, 28, 57, 24, 51],
-          backgroundColor: ['#8B5CF6','#6366F1','#3B82F6','#06B6D4','#10B981','#F59E0B','#EF4444'].map(c => c + 'BB'),
+          label: 'Decade accuracy (%)',
+          data: [14.3, 36.7, 42.7, 66.7],
+          backgroundColor: ['#94A3B8BB', '#6366F1BB', '#F59E0BBB', '#10B981BB'],
+          borderRadius: 6,
+        },
+        {
+          label: 'Valence r (×100)',
+          data: [0, 3.2, 12.1, 32.9],
+          backgroundColor: ['#94A3B844', '#6366F144', '#F59E0B44', '#10B98144'],
           borderRadius: 6,
         }
       ]
@@ -1438,7 +1463,7 @@ Every moment worth its gold`
         legend: { labels: { color: tickCol, font: { size: 11 } } },
         tooltip: {
           mode: 'index', intersect: false,
-          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` }
+          callbacks: { label: ctx => ctx.datasetIndex === 0 ? ` Decade acc: ${ctx.raw}%` : ` Valence r: ${(ctx.raw/100).toFixed(3)}` }
         },
         annotation: {
           annotations: {
