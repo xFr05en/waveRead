@@ -594,6 +594,27 @@
     .out-placeholder i { font-size: 32px; opacity: .3; }
     .out-placeholder p { font-size: 13px; line-height: 1.6; max-width: 180px; }
 
+    /* ── SKELETON LOADER ─────────────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 50%, var(--bg-2) 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    .skeleton-card {
+      background: var(--bg-2); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+    }
+    .skeleton-line { height: 10px; margin-bottom: 10px; }
+    .skeleton-title { height: 40px; width: 60%; margin-bottom: 12px; }
+    .skeleton-bar  { height: 6px;  margin-bottom: 8px; border-radius: 99px; }
+    .skeleton-gauge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .skeleton-gauge { background: var(--bg-2); border: 2px solid var(--border); border-radius: var(--radius); padding: 12px; }
+
     /* ── ABLATION TABLE ──────────────────────────────────────────────────── */
     .ablation-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .ablation-table th {
@@ -843,6 +864,39 @@
           <div class="out-placeholder" id="outPlaceholder">
             <i class="ti ti-music-search"></i>
             <p>Enter lyrics above and hit Analyze to see predictions</p>
+          </div>
+
+          <!-- Skeleton loading state -->
+          <div id="skeletonLoader" style="display:none">
+            <div class="skeleton-card">
+              <div class="skeleton skeleton-line" style="width:40%;margin-bottom:14px"></div>
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-line" style="width:30%"></div>
+              <div style="margin-top:16px">
+                <div class="skeleton skeleton-bar" style="width:35%"></div>
+                <div class="skeleton skeleton-bar" style="width:60%"></div>
+                <div class="skeleton skeleton-bar" style="width:45%"></div>
+                <div class="skeleton skeleton-bar" style="width:80%"></div>
+                <div class="skeleton skeleton-bar" style="width:55%"></div>
+                <div class="skeleton skeleton-bar" style="width:70%"></div>
+                <div class="skeleton skeleton-bar" style="width:40%"></div>
+              </div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton skeleton-line" style="width:50%;margin-bottom:14px"></div>
+              <div class="skeleton-gauge-grid">
+                <div class="skeleton-gauge"><div class="skeleton skeleton-bar" style="width:80%;margin-bottom:10px"></div><div class="skeleton skeleton-line" style="width:40%"></div></div>
+                <div class="skeleton-gauge"><div class="skeleton skeleton-bar" style="width:60%;margin-bottom:10px"></div><div class="skeleton skeleton-line" style="width:40%"></div></div>
+                <div class="skeleton-gauge"><div class="skeleton skeleton-bar" style="width:70%;margin-bottom:10px"></div><div class="skeleton skeleton-line" style="width:40%"></div></div>
+                <div class="skeleton-gauge"><div class="skeleton skeleton-bar" style="width:55%;margin-bottom:10px"></div><div class="skeleton skeleton-line" style="width:40%"></div></div>
+              </div>
+            </div>
+            <div class="skeleton-card">
+              <div class="skeleton skeleton-line" style="width:55%;margin-bottom:14px"></div>
+              <div class="skeleton skeleton-line" style="width:90%"></div>
+              <div class="skeleton skeleton-line" style="width:75%"></div>
+              <div class="skeleton skeleton-line" style="width:85%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1211,6 +1265,8 @@ Every moment worth its gold`
     eqLoader.style.display = 'flex';
     btnText.style.display = 'none';
     showPlaceholder(false);
+    document.getElementById('skeletonLoader').style.display = 'block';
+    document.getElementById('outCol').querySelectorAll('.out-card').forEach(el => el.style.display = 'none');
 
     try {
       let result;
@@ -1240,8 +1296,10 @@ Every moment worth its gold`
         result = await res.json();
       }
 
+      document.getElementById('skeletonLoader').style.display = 'none';
       renderResults(result);
     } catch (e) {
+      document.getElementById('skeletonLoader').style.display = 'none';
       showPlaceholder(true);
       showError(e.message || 'Request failed. Is the model live?');
     } finally {
