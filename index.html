@@ -1282,7 +1282,7 @@ Every moment worth its gold`
         <div class="bar-row">
           <span class="bar-label ${isTop ? 'active' : ''}">${d}</span>
           <div class="bar-track">
-            <div class="bar-fill" style="width:${pct}%;background:${isTop ? 'var(--green)' : DECADE_COLORS[i]}"></div>
+            <div class="bar-fill" style="width:${pct}%;background:${isTop ? '#1DB954' : DECADE_COLORS[i]}"></div>
           </div>
           <span class="bar-pct ${isTop ? 'active' : ''}">${pct}%</span>
         </div>`;
@@ -1316,7 +1316,7 @@ Every moment worth its gold`
         } else if (s > 0.35) {
           bg = 'rgba(245,158,11,0.25)'; col = '#F59E0B'; fw = '500';
         } else {
-          bg = 'transparent'; col = 'var(--text-2)'; fw = '400';
+          bg = 'transparent'; col = '#444440'; fw = '400';
         }
         return `<span class="w" style="background:${bg};color:${col};font-weight:${fw};border-radius:3px;padding:1px 3px" title="attention: ${s.toFixed(3)}">${escHtml(w.word)}</span>`;
       }).join(' ');
@@ -1337,8 +1337,8 @@ Every moment worth its gold`
     }
 
     const audioTag = r.audio_used
-      ? `<span style="font-size:11px;color:var(--green);font-family:var(--font-mono)">+ audio</span>`
-      : `<span style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono)">lyrics only</span>`;
+      ? `<span style="font-size:11px;color:#1DB954;font-family:var(--font-mono)">+ audio</span>`
+      : `<span style="font-size:11px;color:#888882;font-family:var(--font-mono)">lyrics only</span>`;
 
     col.innerHTML = `
       <div class="out-card">
@@ -1370,17 +1370,17 @@ Every moment worth its gold`
       <div class="out-card">
         <div class="out-label">Predicted features</div>
         <div class="gauge-grid">
-          ${gauge('Valence', r.valence, 'var(--green)', r.valence.toFixed(2))}
+          ${gauge('Valence', r.valence, '#1DB954', r.valence.toFixed(2))}
           ${gauge('Energy', r.energy, '#1DB954', r.energy.toFixed(2))}
-          ${gauge('Danceability', r.danceability, 'var(--warning)', r.danceability.toFixed(2))}
-          ${gauge('Tempo', Math.min(r.tempo_bpm / 220, 1), 'var(--secondary)', r.tempo_bpm + '<span style="font-size:10px;font-weight:400"> BPM</span>')}
+          ${gauge('Danceability', r.danceability, '#F59E0B', r.danceability.toFixed(2))}
+          ${gauge('Tempo', Math.min(r.tempo_bpm / 220, 1), '#4ECDC4', r.tempo_bpm + '<span style="font-size:10px;font-weight:400"> BPM</span>')}
         </div>
       </div>
       <div class="out-card">
         <div class="out-label">Word attention — lyrics branch</div>
         <div class="word-attention">${wordHtml}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
-          <div style="height:4px;width:60px;background:linear-gradient(to right,var(--glass-3),var(--green));border-radius:2px"></div>
+          <div style="height:4px;width:60px;background:linear-gradient(to right,rgba(0,0,0,0.08),#1DB954);border-radius:2px"></div>
           <span style="font-size:11px;color:var(--text-3)">low → high attention</span>
         </div>
       </div>
