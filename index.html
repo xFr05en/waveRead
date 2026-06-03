@@ -866,6 +866,9 @@
             <p>Enter lyrics above and hit Analyze to see predictions</p>
           </div>
 
+          <!-- Dynamic results go here -->
+          <div id="resultsContainer"></div>
+
           <!-- Skeleton loading state -->
           <div id="skeletonLoader" style="display:none">
             <div class="skeleton-card">
@@ -1265,8 +1268,8 @@ Every moment worth its gold`
     eqLoader.style.display = 'flex';
     btnText.style.display = 'none';
     showPlaceholder(false);
+    document.getElementById('resultsContainer').innerHTML = '';
     document.getElementById('skeletonLoader').style.display = 'block';
-    document.getElementById('outCol').querySelectorAll('.out-card').forEach(el => el.style.display = 'none');
 
     try {
       let result;
@@ -1324,7 +1327,7 @@ Every moment worth its gold`
 
   // ── RENDER RESULTS ────────────────────────────────────────────────────────────
   function renderResults(r) {
-    const col = document.getElementById('outCol');
+    const col = document.getElementById('resultsContainer');
 
     // Build decade probabilities rows
     const topDecadeProb = Math.max(...DECADE_NAMES.map(d => r.decade_probs[d] || 0));
