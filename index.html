@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WaveRead</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── THEME VARIABLES ─────────────────────────────────────────────────── */
+    :root {
+      --bg:         #FAFAF8;
+      --bg-2:       #F2F0EC;
+      --bg-3:       #E8E4DC;
+      --surface:    #FFFFFF;
+      --text:       #0D0D0D;
+      --text-2:     #444440;
+      --text-3:     #888882;
+      --border:     rgba(0,0,0,0.08);
+      --border-2:   rgba(0,0,0,0.15);
+
+      /* Playful palette */
+      --coral:      #FF6B6B;
+      --yellow:     #FFD93D;
+      --mint:       #6BCB77;
+      --sky:        #4ECDC4;
+      --lavender:   #C77DFF;
+      --orange:     #FF8C42;
+      --black:      #0D0D0D;
+      --green:      #1DB954;
+
+      --accent:     var(--coral);
+      --accent-dim: rgba(255,107,107,0.12);
+      --secondary:  #4ECDC4;
+      --warning:    #F59E0B;
+      --text-dim:   #888882;
+      --glass-1:    rgba(0,0,0,0.04);
+      --glass-3:    rgba(0,0,0,0.08);
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-sans:    'Inter', -apple-system, sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+
+      --radius:    16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
+      --shadow-hover: 0 16px 40px rgba(0,0,0,0.18);
+    }
+
+    /* Dark mode */
+    body.dark {
+      --bg:       #0D0D0D;
+      --bg-2:     #161616;
+      --bg-3:     #1E1E1E;
+      --surface:  #1A1A1A;
+      --text:     #F5F5F0;
+      --text-2:   rgba(245,245,240,0.65);
+      --text-3:   rgba(245,245,240,0.35);
+      --border:   rgba(255,255,255,0.08);
+      --border-2: rgba(255,255,255,0.15);
+      --green:    #1DB954;
+      --secondary: #4ECDC4;
+      --warning:   #F59E0B;
+      --text-dim:  rgba(245,245,240,0.35);
+      --glass-1:   rgba(255,255,255,0.04);
+      --glass-3:   rgba(255,255,255,0.08);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.6);
+      --shadow-hover: 0 16px 40px rgba(0,0,0,0.7);
+    }
+
+    /* ── BASE ────────────────────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+
+    /* ── NAV ─────────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 2px solid var(--border);
+      padding: 14px 0;
+      transition: background 0.3s;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 900; font-style: italic;
+      color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--coral);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.3); }
+    }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      padding: 7px 16px; border-radius: 99px;
+      font-size: 14px; color: var(--text-2);
+      text-decoration: none; font-weight: 500;
+      transition: all .2s;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--bg-2);
+    }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+
+    /* Mode toggle */
+    .mode-toggle {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--border-2);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 17px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .mode-toggle:hover { background: var(--bg-3); transform: rotate(20deg); }
+
+    .nav-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: .03em;
+      padding: 5px 12px; border-radius: 99px;
+      border: 2px solid var(--border);
+      color: var(--text-3);
+      background: var(--surface);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--text-3);
+      transition: background .3s;
+    }
+    .status-dot.live { background: var(--mint); animation: pulse-dot 1.5s ease-in-out infinite; }
+    .status-dot.error { background: var(--coral); }
+
+    .nav-cta {
+      padding: 9px 22px;
+      background: var(--text);
+      color: var(--bg);
+      border-radius: 99px;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none; letter-spacing: .01em;
+      transition: all .2s;
+      border: 2px solid var(--text);
+    }
+    .nav-cta:hover {
+      background: var(--coral);
+      border-color: var(--coral);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,107,107,0.35);
+    }
+
+    /* ── HERO ────────────────────────────────────────────────────────────── */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 2px solid var(--border);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 50% 40% at 20% 50%, rgba(255,107,107,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 35% at 80% 40%, rgba(78,205,196,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 30% at 50% 80%, rgba(255,217,61,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-2);
+      background: var(--bg-2);
+      border: 2px solid var(--border-2);
+      padding: 7px 18px; border-radius: 99px;
+      margin-bottom: 36px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 72px; font-weight: 900;
+      line-height: 1.02; letter-spacing: -.03em;
+      max-width: 820px; margin: 0 auto 28px;
+      color: var(--text);
+    }
+    .hero h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--coral), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px; color: var(--text-2);
+      max-width: 500px; margin: 0 auto 48px;
+      line-height: 1.75; font-weight: 300;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+
+    /* Floating decoration blobs */
+    .hero-blob {
+      position: absolute; border-radius: 50%;
+      opacity: 0.15; pointer-events: none;
+      animation: float 6s ease-in-out infinite;
+    }
+    .hero-blob-1 { width: 120px; height: 120px; background: var(--coral); top: 10%; left: 5%; animation-delay: 0s; }
+    .hero-blob-2 { width: 80px; height: 80px; background: var(--yellow); top: 20%; right: 8%; animation-delay: 1s; }
+    .hero-blob-3 { width: 60px; height: 60px; background: var(--sky); bottom: 20%; left: 12%; animation-delay: 2s; }
+    .hero-blob-4 { width: 100px; height: 100px; background: var(--lavender); bottom: 15%; right: 5%; animation-delay: .5s; }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0px) rotate(0deg); }
+      33%      { transform: translateY(-12px) rotate(3deg); }
+      66%      { transform: translateY(6px) rotate(-2deg); }
+    }
+
+    /* ── BUTTONS ─────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: 99px;
+      font-size: 15px; font-weight: 700;
+      text-decoration: none; cursor: pointer; border: 2px solid transparent;
+      transition: all .2s; letter-spacing: .01em;
+      position: relative; overflow: hidden;
+    }
+    .btn:active { transform: scale(0.97) !important; }
+
+    .btn-primary {
+      background: var(--text); color: var(--bg);
+      border-color: var(--text);
+    }
+    .btn-primary:hover {
+      background: var(--coral); border-color: var(--coral); color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(255,107,107,0.4);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border-color: var(--border-2);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-2);
+      transform: translateY(-2px);
+      border-color: var(--text);
+    }
+
+    /* ── STAT STRIP ──────────────────────────────────────────────────────── */
+    .stat-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-radius: var(--radius-xl); overflow: hidden;
+      gap: 3px; background: var(--border);
+      border: 2px solid var(--border-2);
+    }
+    .stat-cell {
+      padding: 28px 16px; text-align: center;
+      transition: transform .2s;
+      cursor: default;
+    }
+    .stat-cell:nth-child(1) { background: var(--coral); }
+    .stat-cell:nth-child(2) { background: var(--yellow); }
+    .stat-cell:nth-child(3) { background: var(--sky); }
+    .stat-cell:nth-child(4) { background: var(--mint); }
+    .stat-cell:hover { transform: translateY(-4px) scale(1.02); }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 900; letter-spacing: -.03em;
+      color: #0D0D0D; margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 10px; color: rgba(0,0,0,0.6);
+      text-transform: uppercase; letter-spacing: .1em; font-weight: 700;
+    }
+
+    /* ── SECTIONS ────────────────────────────────────────────────────────── */
+    .section { padding: 96px 0; border-bottom: 2px solid var(--border); }
+    .section-kicker {
+      display: inline-block;
+      font-size: 10px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--text);
+      background: var(--yellow);
+      padding: 4px 14px; border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      font-family: var(--font-display);
+      font-size: 46px; font-weight: 900; letter-spacing: -.03em;
+      line-height: 1.05; margin-bottom: 16px; color: var(--text);
+    }
+    .section-sub {
+      font-size: 16px; color: var(--text-2);
+      margin-bottom: 52px; line-height: 1.75; max-width: 520px; font-weight: 300;
+    }
+
+    /* ── HOW IT WORKS ────────────────────────────────────────────────────── */
+    .modality-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .modality-card {
+      border-radius: var(--radius-lg); padding: 28px;
+      border: 2px solid var(--border);
+      transition: transform .25s, box-shadow .25s;
+      cursor: default;
+    }
+    .modality-card:hover {
+      transform: translateY(-6px) rotate(-0.5deg);
+      box-shadow: var(--shadow-hover);
+    }
+    .modality-card.text-card  { background: var(--coral); }
+    .modality-card.audio-card { background: var(--sky); }
+    .modality-label {
+      font-size: 10px; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: 12px;
+      color: rgba(0,0,0,0.55);
+    }
+    .modality-title {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 900; letter-spacing: -.01em;
+      margin-bottom: 10px; color: #0D0D0D;
+    }
+    .modality-desc { font-size: 13px; color: rgba(0,0,0,0.65); line-height: 1.65; margin-bottom: 16px; }
+    .feature-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-family: var(--font-mono); font-size: 10px;
+      padding: 4px 10px; border-radius: 99px; font-weight: 600;
+      background: rgba(0,0,0,0.12); color: #0D0D0D;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .fusion-row {
+      background: var(--yellow);
+      border: 2px solid var(--border-2);
+      border-radius: var(--radius); padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .fusion-label {
+      font-size: 10px; font-weight: 800; color: rgba(0,0,0,0.5);
+      text-transform: uppercase; letter-spacing: .08em; flex-shrink: 0;
+    }
+    .fusion-desc  { font-size: 13px; color: rgba(0,0,0,0.7); }
+    .fusion-tag {
+      font-family: var(--font-mono); font-size: 11px;
+      background: rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.18);
+      padding: 5px 12px; border-radius: 8px;
+      color: #0D0D0D; white-space: nowrap; flex-shrink: 0; font-weight: 700;
+    }
+
+    /* ── DEMO BROWSER ────────────────────────────────────────────────────── */
+    .browser {
+      border: 2px solid var(--border-2);
+      border-radius: var(--radius-xl); overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .browser-bar {
+      background: var(--bg-2);
+      border-bottom: 2px solid var(--border);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .browser-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .browser-url {
+      margin-left: 8px;
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--text-3);
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 6px; padding: 3px 14px;
+    }
+    .browser-body {
+      padding: 20px;
+      display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px;
+      background: var(--surface);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Input panel */
+    .input-panel {
+      border: 2px solid var(--border-2);
+      border-radius: var(--radius); overflow: hidden;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+    }
+    .panel-header {
+      background: var(--bg-2);
+      border-bottom: 2px solid var(--border);
+      padding: 8px 12px;
+      font-size: 10px; font-weight: 800; color: var(--text-3);
+      display: flex; align-items: center; gap: 6px;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .lyrics-textarea {
+      flex: 1; width: 100%; min-height: 120px;
+      padding: 14px; background: transparent;
+      border: none; outline: none;
+      color: var(--text); font-size: 13px;
+      font-family: var(--font-sans); line-height: 2; resize: none;
+    }
+    .lyrics-textarea::placeholder { color: var(--text-3); }
+
+    /* Sample buttons */
+    .sample-row { display:flex; gap:6px; flex-wrap:wrap; padding:8px 12px 0; }
+    .sample-btn {
+      font-size:10px; font-family:var(--font-sans);
+      background: var(--bg-2); border: 2px solid var(--border-2);
+      border-radius: 99px; padding: 4px 12px;
+      cursor: pointer; color: var(--text-2);
+      font-weight: 700; letter-spacing:.04em; text-transform:uppercase;
+      transition: all .15s;
+    }
+    .sample-btn:hover {
+      background: var(--coral); border-color: var(--coral);
+      color: #fff; transform: translateY(-1px);
+    }
+
+    /* Speech status */
+    .speech-status {
+      font-size:10px; color: var(--lavender);
+      font-family:var(--font-mono); margin-top:4px;
+      padding: 0 12px; display:none;
+    }
+    .speech-status.visible { display:block; }
+
+    /* Audio row */
+    .audio-row { border-top: 2px solid var(--border); background: var(--bg-2); }
+    .audio-mode-tabs { display: flex; border-bottom: 2px solid var(--border); }
+    .audio-mode-tab {
+      flex: 1; padding: 7px 0; text-align: center;
+      font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--text-3); cursor: pointer;
+      background: transparent; border: none;
+      font-family: var(--font-sans); transition: all .15s;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .audio-mode-tab:first-child { border-right: 2px solid var(--border); }
+    .audio-mode-tab.active { color: var(--text); background: var(--surface); }
+    .audio-mode-tab:hover:not(.active) { color: var(--text-2); }
+
+    /* Record panel */
+    .record-panel, .upload-panel { padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+    .upload-panel { display: none; }
+
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(255,107,107,0.6); }
+      70%  { box-shadow: 0 0 0 8px rgba(255,107,107,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+    }
+    .rec-btn-main {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 16px; border-radius: 99px;
+      font-size: 11px; font-weight: 800; font-family: var(--font-sans);
+      cursor: pointer; letter-spacing: .06em; text-transform: uppercase;
+      background: rgba(255,107,107,0.12); color: var(--coral);
+      border: 2px solid rgba(255,107,107,0.35); transition: all .15s;
+    }
+    .rec-btn-main:hover { background: rgba(255,107,107,0.22); }
+    .rec-btn-main.recording { animation: pulse-ring 1.2s ease-out infinite; background: rgba(255,107,107,0.22); }
+    .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); flex-shrink: 0; }
+    .rec-timer { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); min-width: 36px; }
+    .rec-timer.active { color: var(--coral); }
+    .rec-status { font-size: 11px; color: var(--text-3); margin-left: auto; display: flex; align-items: center; gap: 4px; }
+    .rec-status.done { color: var(--mint); }
+    .rec-clear-btn { font-size: 10px; background: transparent; border: none; color: var(--text-3); cursor: pointer; padding: 2px 4px; font-family: var(--font-sans); }
+    .rec-clear-btn:hover { color: var(--coral); }
+
+    .audio-file-input { display: none; }
+    .audio-file-btn {
+      font-size: 11px; font-family: var(--font-sans);
+      background: var(--bg-2); border: 2px solid var(--border-2);
+      border-radius: 8px; padding: 5px 14px;
+      cursor: pointer; color: var(--text-2); font-weight: 600;
+      transition: all .15s;
+    }
+    .audio-file-btn:hover { background: var(--bg-3); color: var(--text); }
+    .audio-filename { font-size: 11px; color: var(--coral); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+
+    .panel-footer { border-top: 2px solid var(--border); padding: 10px 12px; background: var(--bg-2); }
+
+    /* Equalizer loader */
+    @keyframes eq1 { 0%,100%{height:4px} 50%{height:14px} }
+    @keyframes eq2 { 0%,100%{height:10px} 50%{height:4px} }
+    @keyframes eq3 { 0%,100%{height:6px} 33%{height:14px} 66%{height:4px} }
+    @keyframes eq4 { 0%,100%{height:12px} 50%{height:4px} }
+    @keyframes eq5 { 0%,100%{height:4px} 40%{height:12px} }
+    .eq-loader { display:none; align-items:flex-end; gap:2px; height:16px; }
+    .eq-loader span { display:block; width:3px; border-radius:2px; background:var(--bg); animation-duration:.8s; animation-timing-function:ease-in-out; animation-iteration-count:infinite; }
+    .eq-loader span:nth-child(1){height:4px;animation-name:eq1}
+    .eq-loader span:nth-child(2){height:10px;animation-name:eq2;animation-delay:.1s}
+    .eq-loader span:nth-child(3){height:6px;animation-name:eq3;animation-delay:.2s}
+    .eq-loader span:nth-child(4){height:12px;animation-name:eq4;animation-delay:.05s}
+    .eq-loader span:nth-child(5){height:4px;animation-name:eq5;animation-delay:.15s}
+    .loading .eq-loader { display:flex; }
+
+    .analyze-btn {
+      width: 100%; padding: 11px;
+      background: var(--text); color: var(--bg);
+      border: 2px solid var(--text); border-radius: 99px;
+      font-size: 13px; font-weight: 800; cursor: pointer;
+      font-family: var(--font-sans); letter-spacing: .06em; text-transform: uppercase;
+      transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .analyze-btn:hover:not(:disabled) {
+      background: var(--coral); border-color: var(--coral); color: #fff;
+      box-shadow: 0 6px 24px rgba(255,107,107,0.4); transform: translateY(-1px);
+    }
+    .analyze-btn:active { transform: scale(0.98) !important; }
+    .analyze-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* Error banner */
+    .error-banner {
+      display: none; margin: 8px 12px; padding: 8px 14px;
+      background: rgba(255,107,107,0.10); border: 2px solid rgba(255,107,107,0.30);
+      border-radius: 10px; font-size: 12px; color: var(--coral); font-weight: 600;
+    }
+    .error-banner.visible { display: block; }
+
+    /* ── OUTPUT ──────────────────────────────────────────────────────────── */
+    .out-col { display: flex; flex-direction: column; gap: 10px; }
+    .out-card {
+      background: var(--bg);
+      border: 2px solid var(--border-2);
+      border-radius: var(--radius); padding: 14px 16px;
+      transition: border-color .2s;
+    }
+    .out-card:hover { border-color: var(--text); }
+    .out-label { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--text-3); font-weight: 800; margin-bottom: 10px; }
+    .conf-ring-wrap { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+    .conf-ring-wrap svg { flex-shrink:0; }
+    .conf-ring-label { font-family: var(--font-display); font-size:30px; font-weight:900; letter-spacing:-.03em; color: var(--text); }
+    .conf-ring-sub { font-size:11px; color:var(--text-3); margin-top:2px; font-weight: 600; }
+    .badge {
+      display: inline-block; padding: 3px 12px; border-radius: 99px;
+      font-size: 10px; font-weight: 800;
+      background: var(--yellow); color: #0D0D0D;
+      border: none; letter-spacing: .04em;
+    }
+    .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .bar-label { font-size: 11px; color: var(--text-3); width: 38px; text-align: right; flex-shrink: 0; font-weight: 600; }
+    .bar-label.active { color: var(--text); font-weight: 800; }
+    .bar-track { flex: 1; height: 5px; background: var(--bg-2); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+    .bar-fill { height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.34,1.56,.64,1); }
+    .bar-pct { font-size: 10px; color: var(--text-3); width: 28px; text-align: right; font-family: var(--font-mono); font-weight: 600; }
+    .bar-pct.active { color: var(--text); font-weight: 800; }
+    .gauge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .gauge { background: var(--bg-2); border: 2px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+    .gauge-label { font-size: 9px; color: var(--text-3); margin-bottom: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .gauge-track { height: 4px; background: var(--bg-3); border-radius: 99px; margin-bottom: 7px; overflow: hidden; }
+    .gauge-fill { height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.34,1.56,.64,1); }
+    .gauge-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); }
+
+    /* Word attention */
+    .word-attention { font-size: 13px; line-height: 2.6; }
+    .w { display: inline; padding: 2px 5px; border-radius: 5px; margin: 1px; transition: transform .1s; cursor: default; }
+    .w:hover { transform: scale(1.05); }
+
+    /* Warnings */
+    .warnings-list { margin-top: 6px; }
+    .warning-item { font-size: 11px; color: var(--orange); display: flex; align-items: flex-start; gap: 5px; margin-bottom: 4px; line-height: 1.5; font-weight: 600; }
+
+    /* Placeholder */
+    .out-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 40px 20px; color: var(--text-3); gap: 10px;
+    }
+    .out-placeholder i { font-size: 32px; opacity: .3; }
+    .out-placeholder p { font-size: 13px; line-height: 1.6; max-width: 180px; }
+
+    /* ── ABLATION TABLE ──────────────────────────────────────────────────── */
+    .ablation-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .ablation-table th {
+      text-align: left; padding: 12px 16px;
+      font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text-3); border-bottom: 2px solid var(--border);
+    }
+    .ablation-table td { padding: 14px 16px; border-bottom: 2px solid var(--border); color: var(--text-2); }
+    .ablation-table tr:last-child td { border-bottom: none; }
+    .ablation-table tr.winner td { color: var(--text); background: rgba(107,203,119,0.12); }
+    .model-name { font-weight: 800; color: var(--text); }
+    .mono { font-family: var(--font-mono); font-size: 13px; }
+    .tag-gain { font-size: 11px; color: var(--mint); font-family: var(--font-mono); font-weight: 700; }
+
+    /* ── RESEARCH ────────────────────────────────────────────────────────── */
+    .research-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: start; }
+    .chart-card {
+      background: var(--surface); border: 2px solid var(--border-2);
+      border-radius: var(--radius-lg); padding: 24px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .chart-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .chart-title { font-size: 11px; font-weight: 800; color: var(--text-3); margin-bottom: 16px; letter-spacing: .06em; text-transform: uppercase; }
+    .chart-wrap { position: relative; height: 220px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-2); }
+    .legend-line { width: 20px; height: 2px; border-radius: 1px; display: inline-block; }
+    .findings { display: flex; flex-direction: column; gap: 10px; }
+    .finding {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      border-left: 4px solid transparent;
+      transition: all .2s;
+    }
+    .finding:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
+    .finding h4 { font-family: var(--font-display); font-size: 15px; font-weight: 900; margin-bottom: 5px; color: var(--text); }
+    .finding p  { font-size: 12px; color: var(--text-2); line-height: 1.65; }
+
+    /* ── TECH GRID ───────────────────────────────────────────────────────── */
+    .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .tech-card {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-lg); padding: 22px 12px; text-align: center;
+      transition: all .25s; cursor: default;
+    }
+    .tech-card:nth-child(1):hover { background: var(--coral); border-color: var(--coral); }
+    .tech-card:nth-child(2):hover { background: var(--yellow); border-color: var(--yellow); }
+    .tech-card:nth-child(3):hover { background: var(--sky); border-color: var(--sky); }
+    .tech-card:nth-child(4):hover { background: var(--mint); border-color: var(--mint); }
+    .tech-card:nth-child(5):hover { background: var(--lavender); border-color: var(--lavender); }
+    .tech-card:nth-child(6):hover { background: var(--orange); border-color: var(--orange); }
+    .tech-card:nth-child(7):hover { background: var(--coral); border-color: var(--coral); }
+    .tech-card:nth-child(8):hover { background: var(--yellow); border-color: var(--yellow); }
+    .tech-card:hover { transform: translateY(-6px) rotate(1deg); box-shadow: var(--shadow-hover); }
+    .tech-card:hover .tech-icon { color: #0D0D0D; }
+    .tech-card:hover .tech-name, .tech-card:hover .tech-role { color: #0D0D0D; }
+    .tech-icon { font-size: 24px; color: var(--text-3); margin-bottom: 8px; display: block; transition: color .2s; }
+    .tech-name { font-size: 13px; font-weight: 800; margin-bottom: 3px; color: var(--text); transition: color .2s; }
+    .tech-role { font-size: 10px; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; transition: color .2s; }
+
+    /* ── FOOTER ──────────────────────────────────────────────────────────── */
+    footer {
+      padding: 64px 0;
+      text-align: center;
+      border-top: 2px solid var(--border);
+      background: var(--bg-2);
+    }
+    footer p { font-family: var(--font-display); font-size: 14px; color: var(--text-3); font-style: italic; }
+
+    /* ── CONFIDENCE RING ─────────────────────────────────────────────────── */
+    .conf-ring-wrap { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .hero h1 { font-size: 40px; }
+      .section h2 { font-size: 32px; }
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
+      .modality-grid { grid-template-columns: 1fr; }
+      .browser-body { grid-template-columns: 1fr; }
+      .research-layout { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+      .hero-blob { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-dot"></div>
+      WaveRead
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#demo">Demo</a>
+      <a href="#research">Findings</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-status" id="navStatus">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connecting…</span>
+      </div>
+      <button class="mode-toggle" id="modeToggle" onclick="toggleMode()" title="Toggle dark/light mode">☀️</button>
+      <a href="#demo" class="nav-cta">Try the demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="container">
+  <section class="hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="hero-blob hero-blob-4"></div>
+    <div class="hero-kicker">
+      <i class="ti ti-sparkles" style="font-size:13px"></i>
+      NLP Final Project &nbsp;·&nbsp; Multimodal Learning &nbsp;·&nbsp; RoBERTa + Librosa
+    </div>
+    <h1>What do <em>words and sound</em> reveal about when a song was made?</h1>
+    <p class="hero-sub">A multimodal model combining lyrics and audio to predict emotional valence, energy, danceability, tempo, and decade — trained on songs from the 1960s through the 2020s.</p>
+    <div class="hero-actions">
+      <a href="#demo" class="btn btn-primary"><i class="ti ti-player-play"></i> Try the demo</a>
+      <a href="#research" class="btn btn-ghost"><i class="ti ti-chart-line"></i> View findings</a>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-num">14,000</div><div class="stat-label">Songs</div></div>
+      <div class="stat-cell"><div class="stat-num">7</div><div class="stat-label">Decades</div></div>
+      <div class="stat-cell"><div class="stat-num">2</div><div class="stat-label">Modalities</div></div>
+      <div class="stat-cell"><div class="stat-num">5</div><div class="stat-label">Predictions</div></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how-it-works">
+    <div class="section-kicker">How it works</div>
+    <h2>Text and sound, analyzed together</h2>
+    <p class="section-sub">Two branches process lyrics and audio independently, then fuse into a single representation that drives five simultaneous predictions.</p>
+
+    <div class="modality-grid">
+      <div class="modality-card text-card">
+        <div class="modality-label">Text branch</div>
+        <div class="modality-title">RoBERTa reads the lyrics</div>
+        <p class="modality-desc">Full song lyrics (up to 512 tokens) are fed into frozen RoBERTa-base. The 768-dim CLS embedding captures vocabulary, syntax, and lyrical themes — then projected to 256 dims for fusion.</p>
+        <div class="feature-pills">
+          <span class="pill">full lyrics</span>
+          <span class="pill">roberta-base</span>
+          <span class="pill">768-dim CLS</span>
+          <span class="pill">12 frozen layers</span>
+        </div>
+      </div>
+      <div class="modality-card audio-card">
+        <div class="modality-label">Audio branch</div>
+        <div class="modality-title">Librosa reads the sound</div>
+        <p class="modality-desc">A 30-second audio clip is analyzed for timbral texture, melody, rhythm, and brightness. A small MLP (20→128→256) compresses this into a matched-dimension audio embedding.</p>
+        <div class="feature-pills">
+          <span class="pill">MFCCs ×13</span>
+          <span class="pill">chroma</span>
+          <span class="pill">spectral centroid</span>
+          <span class="pill">tempo</span>
+          <span class="pill">ZCR</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fusion-row">
+      <span class="fusion-label">Fusion</span>
+      <span class="fusion-tag">256 + 256 → 512-dim</span>
+      <p class="fusion-desc">Both embeddings are concatenated and passed through a fusion layer, then into five output heads that predict valence, decade, energy, danceability, and tempo simultaneously using homoscedastic uncertainty weighting.</p>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="section" id="demo">
+    <div class="section-kicker">Live demo</div>
+    <h2>Song analyzer</h2>
+    <p class="section-sub">Paste any song's lyrics — verse, chorus, bridge. Optionally upload a 30s audio clip. The model returns all five predictions with word-level attention highlights.</p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dot" style="background:#FF5F57"></div>
+        <div class="browser-dot" style="background:#FFBD2E"></div>
+        <div class="browser-dot" style="background:#28CA41"></div>
+        <div class="browser-url">fr05enzz-waveread.hf.space</div>
+      </div>
+      <div class="browser-body">
+        <!-- Input panel -->
+        <div class="input-panel">
+          <div class="panel-header">
+            <i class="ti ti-music" style="font-size:12px"></i> Lyrics input
+          </div>
+          <div class="sample-row">
+            <span style="font-size:11px;color:var(--text-dim);align-self:center">Try:</span>
+            <button class="sample-btn" onclick="loadSample('60s')">60s ballad</button>
+            <button class="sample-btn" onclick="loadSample('90s')">90s hip-hop</button>
+            <button class="sample-btn" onclick="loadSample('2010s')">2010s pop</button>
+          </div>
+          <textarea
+            class="lyrics-textarea"
+            id="lyricsInput"
+            placeholder="Paste song lyrics here…"
+          ></textarea>
+          <div class="speech-status" id="speechStatus">🎤 Transcribing speech to lyrics…</div>
+          <div class="error-banner" id="errorBanner"></div>
+          <!-- Audio: record or upload -->
+          <div class="audio-row">
+            <div class="audio-mode-tabs">
+              <button class="audio-mode-tab active" id="tabRecord" onclick="switchAudioMode('record')">
+                <i class="ti ti-microphone" style="font-size:11px"></i> Record
+              </button>
+              <button class="audio-mode-tab" id="tabUpload" onclick="switchAudioMode('upload')">
+                <i class="ti ti-upload" style="font-size:11px"></i> Upload file
+              </button>
+            </div>
+            <!-- Record panel -->
+            <div class="record-panel" id="recordPanel">
+              <button class="rec-btn-main" id="recBtn" onclick="toggleRecording()">
+                <div class="rec-dot"></div>
+                <span id="recBtnText">Record</span>
+              </button>
+              <span class="rec-timer" id="recTimer">0:00</span>
+              <span class="rec-status" id="recStatus">
+                <span id="recStatusText">optional · 30s recommended</span>
+              </span>
+            </div>
+            <!-- Upload panel -->
+            <div class="upload-panel" id="uploadPanel">
+              <button class="audio-file-btn" onclick="document.getElementById('audioInput').click()">
+                <i class="ti ti-upload" style="font-size:11px"></i> Choose .mp3 / .wav
+              </button>
+              <input type="file" id="audioInput" class="audio-file-input" accept=".wav,.mp3,.ogg,.flac,.m4a,.webm,.mp4" onchange="onAudioSelected(this)" />
+              <span class="audio-filename" id="audioFilename"></span>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+              <div class="eq-loader" id="eqLoader"><span></span><span></span><span></span><span></span><span></span></div>
+              <span id="analyzeBtnText"><i class="ti ti-sparkles" style="font-size:13px"></i> Analyze</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Output panel -->
+        <div class="out-col" id="outCol">
+          <div class="out-placeholder" id="outPlaceholder">
+            <i class="ti ti-music-search"></i>
+            <p>Enter lyrics above and hit Analyze to see predictions</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABLATION STUDY -->
+  <section class="section">
+    <div class="section-kicker">Ablation study</div>
+    <h2>Text vs. audio vs. both</h2>
+    <p class="section-sub">Evaluated on a held-out test set of 1,400 songs across 7 decades (1960s–2020s). The multimodal model achieves 45.3% decade accuracy — 3.2× above the 14.3% random baseline.</p>
+    <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--glass-1);backdrop-filter:blur(12px)">
+      <table class="ablation-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Input</th>
+            <th>Decade accuracy</th>
+            <th>Valence r</th>
+            <th>Valence MSE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="model-name">Random baseline</span></td>
+            <td><span class="mono">—</span></td>
+            <td><span class="mono">14.3%</span></td>
+            <td><span class="mono">0.00</span></td>
+            <td><span class="mono">—</span></td>
+          </tr>
+          <tr class="winner">
+            <td><span class="model-name">Multimodal (ours)</span></td>
+            <td><span class="mono">lyrics + audio</span></td>
+            <td><span class="mono">45.3% <span class="tag-gain">+31pp</span></span></td>
+            <td><span class="mono">0.546</span></td>
+            <td><span class="mono">0.0109</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--text-3);margin-top:12px">Evaluated on 1,400 held-out songs stratified by decade. Dataset: 14,000 songs across 7 decades sourced from the Genius lyrics corpus via HuggingFace. Adjacent decades (e.g. 1980s/1990s) are the hardest to distinguish — by design, as musical style evolves continuously.</p>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="section" id="research">
+    <div class="section-kicker">Research findings</div>
+    <h2>How the model distinguishes decades</h2>
+    <p class="section-sub">The audio branch provides the decisive signal. Without it, RoBERTa alone barely beats a random baseline — lyrics vocabulary is less decade-specific than audio texture.</p>
+    <div class="research-layout">
+      <div class="chart-card">
+        <div class="chart-title">Decade accuracy: multimodal vs. text-only</div>
+        <div class="chart-wrap"><canvas id="ablationChart"></canvas></div>
+      </div>
+      <div class="findings">
+        <div class="finding" style="border-left-color:#1DB954">
+          <h4>3.2× above random chance</h4>
+          <p>The multimodal model achieves 45.3% accuracy on a 7-class decade problem where random chance is 14.3%. The 1960s (66%) and 2000s (57%) are the strongest — decades with the most distinctive linguistic and acoustic signatures.</p>
+        </div>
+        <div class="finding" style="border-left-color:#3B82F6">
+          <h4>Adjacent decades are the hardest</h4>
+          <p>The 1980s (36%) and 1990s (28%) are the most confused decades — frequently misclassified as each other. This reflects genuine musical continuity: decade boundaries are arbitrary, but style evolves gradually.</p>
+        </div>
+        <div class="finding" style="border-left-color:#F59E0B">
+          <h4>Valence correlates moderately (r = 0.546)</h4>
+          <p>Predicted valence correlates with Librosa-derived labels at r = 0.546, MSE = 0.0109. The model captures general emotional tone but struggles with extremes — very happy and very sad songs both get pulled toward the middle.</p>
+        </div>
+        <div class="finding" style="border-left-color:#A78BFA">
+          <h4>Null embedding prevents audio-missing collapse</h4>
+          <p>A learned null embedding replaces missing audio vectors. With 20% modality dropout during training, the model gracefully degrades to lyrics-only at inference — 6% of the dataset had no audio available.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERA TIME MACHINE -->
+  <section class="section" id="era">
+    <div class="section-kicker">Research finding</div>
+    <h2>Emotional drift across decades</h2>
+    <p class="section-sub">Mean valence (emotional positivity) computed from Librosa audio features across 14,000 songs. Higher = more positive/happy. Lower = more negative/melancholic.</p>
+    <div class="chart-card" style="max-width:100%">
+      <div class="chart-title">Average Valence by Decade (1960s–2020s)</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="eraChart"></canvas></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px">
+      <div class="finding" style="border-left-color:#10B981">
+        <h4>2000s peaked highest</h4>
+        <p>Mean valence of 0.575 — the most emotionally positive decade in the dataset, dominated by upbeat pop and early hip-hop.</p>
+      </div>
+      <div class="finding" style="border-left-color:#F59E0B">
+        <h4>1960s slightly lower</h4>
+        <p>Despite the era's reputation for optimism, valence (0.538) reflects that Librosa measures acoustic brightness, not lyrical sentiment.</p>
+      </div>
+      <div class="finding" style="border-left-color:#EF4444">
+        <h4>2010s most melancholic</h4>
+        <p>Lowest mean valence at 0.554 — consistent with the rise of emotionally darker genres like emo-rap, lo-fi, and moody pop in that era.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="section">
+    <div class="section-kicker">Tech stack</div>
+    <h2>Built with</h2>
+    <p class="section-sub">End-to-end pipeline from data collection to live multimodal inference.</p>
+    <div class="tech-grid">
+      <div class="tech-card"><i class="ti ti-brain tech-icon"></i><div class="tech-name">RoBERTa</div><div class="tech-role">Text branch</div></div>
+      <div class="tech-card"><i class="ti ti-waveform tech-icon"></i><div class="tech-name">Librosa</div><div class="tech-role">Audio features</div></div>
+      <div class="tech-card"><i class="ti ti-flame tech-icon"></i><div class="tech-name">PyTorch</div><div class="tech-role">Custom training loop</div></div>
+      <div class="tech-card"><i class="ti ti-server tech-icon"></i><div class="tech-name">FastAPI</div><div class="tech-role">Backend API</div></div>
+      <div class="tech-card"><i class="ti ti-brand-docker tech-icon"></i><div class="tech-name">Docker</div><div class="tech-role">Containerization</div></div>
+      <div class="tech-card"><i class="ti ti-cloud tech-icon"></i><div class="tech-name">HF Spaces</div><div class="tech-role">Model hosting</div></div>
+      <div class="tech-card"><i class="ti ti-database tech-icon"></i><div class="tech-name">HuggingFace</div><div class="tech-role">Lyrics dataset</div></div>
+      <div class="tech-card"><i class="ti ti-chart-scatter tech-icon"></i><div class="tech-name">scikit-learn</div><div class="tech-role">Preprocessing</div></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <p>WaveRead &nbsp;·&nbsp; NLP Course Final Project &nbsp;·&nbsp; RoBERTa + Librosa + PyTorch</p>
+  <p style="margin-top:12px;font-family:var(--font-display);font-size:20px;font-weight:900;font-style:italic;color:var(--text);opacity:0.85;">Made by Wonbin Kim</p>
+</footer>
+
+<script>
+  // ── DARK / LIGHT MODE TOGGLE ────────────────────────────────────────────────
+  function toggleMode() {
+    const isDark = document.body.classList.toggle('dark');
+    document.getElementById('modeToggle').textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  // Restore saved theme
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('modeToggle').textContent = '🌙';
+  }
+
+  // ── CONFIG ──────────────────────────────────────────────────────────────────
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8000'
+    : window.location.origin;
+
+  // ── SAMPLE LYRICS (original, not from any real song) ─────────────────────
+  const SAMPLES = {
+    '60s': `Darling won't you take my hand
+Walk with me across the land
+The sun is shining bright today
+And all my troubles fade away
+Somewhere over distant hills
+The morning light my spirit fills
+Oh darling can't you see
+You are the world to me`,
+    '90s': `Stepping through the city night
+Got my mind right, everything tight
+Every move calculated precise
+Never rolling the dice twice
+Built this from the ground up raw
+Nobody handed me nothing at all
+Hard work and sacrifice
+That's the only price`,
+    '2010s': `I don't need your words tonight
+Just the feeling getting it right
+Neon lights and empty streets
+Heart still moving to the beat
+We were young and unafraid
+Living off the choices made
+Every scar a story told
+Every moment worth its gold`
+  };
+
+  function loadSample(key) {
+    document.getElementById('lyricsInput').value = SAMPLES[key];
+    document.getElementById('errorBanner').classList.remove('visible');
+  }
+  const DECADE_NAMES = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+  const DECADE_COLORS = ['#8B5CF6', '#6366F1', '#3B82F6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'];
+
+  // ── AUDIO MODE TOGGLE ────────────────────────────────────────────────────────
+  function switchAudioMode(mode) {
+    const isRecord = mode === 'record';
+    document.getElementById('recordPanel').style.display = isRecord ? 'flex' : 'none';
+    document.getElementById('uploadPanel').style.display = isRecord ? 'none'  : 'flex';
+    document.getElementById('tabRecord').classList.toggle('active', isRecord);
+    document.getElementById('tabUpload').classList.toggle('active', !isRecord);
+    // Clear the other mode's state
+    if (isRecord) { clearUpload(); }
+    else          { stopRecordingClean(); clearRecording(); }
+  }
+
+  // ── RECORDING ────────────────────────────────────────────────────────────────
+  let mediaRecorder = null;
+  let audioChunks   = [];
+  let recordedBlob  = null;
+  let recordingTimer = null;
+  let recordingSecs  = 0;
+  const MAX_RECORD_SECS = 120;
+  let speechRecognizer = null;
+
+  async function toggleRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopRecordingClean();
+    } else {
+      await startRecording();
+    }
+  }
+
+  async function startRecording() {
+    clearRecording();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunks = [];
+      recordingSecs = 0;
+
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+                     : MediaRecorder.isTypeSupported('audio/webm')              ? 'audio/webm'
+                     : MediaRecorder.isTypeSupported('audio/mp4')               ? 'audio/mp4'
+                     : '';
+
+      mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+
+      mediaRecorder.onstop = () => {
+        const mime = mediaRecorder.mimeType || 'audio/webm';
+        recordedBlob = new Blob(audioChunks, { type: mime });
+        stream.getTracks().forEach(t => t.stop());
+        setRecordingUI(false);
+        const status = document.getElementById('recStatus');
+        const statusText = document.getElementById('recStatusText');
+        status.className = 'rec-status done';
+        statusText.innerHTML = `<i class="ti ti-check" style="font-size:10px"></i> ${formatTime(recordingSecs)} recorded
+          <button class="rec-clear-btn" onclick="clearRecording()" title="Remove recording">✕</button>`;
+      };
+
+      mediaRecorder.start(250); // collect chunks every 250ms
+      setRecordingUI(true);
+
+      // ── Speech-to-text (fills lyrics textarea while recording) ──
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRec) {
+        speechRecognizer = new SpeechRec();
+        speechRecognizer.continuous = true;
+        speechRecognizer.interimResults = true;
+        speechRecognizer.lang = 'en-US';
+        let finalTranscript = '';
+        speechRecognizer.onresult = e => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+            else interim = e.results[i][0].transcript;
+          }
+          document.getElementById('lyricsInput').value = finalTranscript + interim;
+        };
+        speechRecognizer.onerror = () => {};
+        speechRecognizer.start();
+        document.getElementById('speechStatus').classList.add('visible');
+      }
+
+      recordingTimer = setInterval(() => {
+        recordingSecs++;
+        document.getElementById('recTimer').textContent = formatTime(recordingSecs);
+        if (recordingSecs >= MAX_RECORD_SECS) stopRecordingClean();
+      }, 1000);
+
+    } catch (e) {
+      showError('Microphone access denied. Please allow mic access and try again.');
+    }
+  }
+
+  function stopRecordingClean() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+    if (speechRecognizer) { try { speechRecognizer.stop(); } catch(e){} speechRecognizer = null; }
+    document.getElementById('speechStatus').classList.remove('visible');
+    clearInterval(recordingTimer);
+    recordingTimer = null;
+  }
+
+  function setRecordingUI(isRecording) {
+    const btn  = document.getElementById('recBtn');
+    const text = document.getElementById('recBtnText');
+    const timer = document.getElementById('recTimer');
+    if (isRecording) {
+      btn.classList.add('recording');
+      text.textContent = 'Stop';
+      timer.classList.add('active');
+    } else {
+      btn.classList.remove('recording');
+      text.textContent = 'Record';
+      timer.classList.remove('active');
+    }
+  }
+
+  function clearRecording() {
+    stopRecordingClean();
+    recordedBlob = null;
+    audioChunks  = [];
+    recordingSecs = 0;
+    document.getElementById('recTimer').textContent = '0:00';
+    document.getElementById('recTimer').classList.remove('active');
+    document.getElementById('recStatus').className = 'rec-status';
+    document.getElementById('recStatusText').textContent = 'optional · 30s recommended';
+    document.getElementById('recBtn').classList.remove('recording');
+    document.getElementById('recBtnText').textContent = 'Record';
+  }
+
+  function formatTime(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  // ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+  function onAudioSelected(input) {
+    const fn = document.getElementById('audioFilename');
+    fn.textContent = input.files[0] ? input.files[0].name : '';
+  }
+  function clearUpload() {
+    const inp = document.getElementById('audioInput');
+    if (inp) inp.value = '';
+    document.getElementById('audioFilename').textContent = '';
+  }
+
+  // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
+  async function checkHealth() {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    try {
+      const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(10000) });
+      if (res.ok) {
+        dot.classList.add('live');
+        txt.textContent = 'Model live';
+      } else {
+        dot.classList.add('error');
+        txt.textContent = 'API error';
+      }
+    } catch {
+      dot.classList.add('error');
+      txt.textContent = 'Offline';
+    }
+  }
+  checkHealth();
+
+
+  // ── ANALYZE ──────────────────────────────────────────────────────────────────
+  async function analyze() {
+    const lyrics = document.getElementById('lyricsInput').value.trim();
+    const audioInput = document.getElementById('audioInput');
+    // Prefer recorded blob, then uploaded file
+    const uploadedFile = audioInput.files[0] || null;
+    const audioFile = recordedBlob
+      ? new File([recordedBlob], 'recording.webm', { type: recordedBlob.type })
+      : uploadedFile;
+    const btn = document.getElementById('analyzeBtn');
+    const eqLoader = document.getElementById('eqLoader');
+    const btnText = document.getElementById('analyzeBtnText');
+    const errBanner = document.getElementById('errorBanner');
+
+    // Clear errors
+    errBanner.textContent = '';
+    errBanner.classList.remove('visible');
+
+    if (!lyrics) {
+      showError('Paste some lyrics before analyzing.');
+      return;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    eqLoader.style.display = 'flex';
+    btnText.style.display = 'none';
+    showPlaceholder(false);
+
+    try {
+      let result;
+      if (audioFile) {
+        const form = new FormData();
+        form.append('lyrics', lyrics);
+        form.append('audio', audioFile);
+        const res = await fetch(`${API_BASE}/predict-with-audio`, {
+          method: 'POST',
+          body: form,
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        result = await res.json();
+      } else {
+        const res = await fetch(`${API_BASE}/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lyrics }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        result = await res.json();
+      }
+
+      renderResults(result);
+    } catch (e) {
+      showPlaceholder(true);
+      showError(e.message || 'Request failed. Is the model live?');
+    } finally {
+      btn.disabled = false;
+      eqLoader.style.display = 'none';
+      btnText.style.display = 'flex';
+      btnText.style.alignItems = 'center';
+      btnText.style.gap = '6px';
+    }
+  }
+
+  function showError(msg) {
+    const banner = document.getElementById('errorBanner');
+    banner.textContent = '⚠ ' + msg;
+    banner.classList.add('visible');
+  }
+
+  function showPlaceholder(show) {
+    const ph = document.getElementById('outPlaceholder');
+    if (ph) ph.style.display = show ? 'flex' : 'none';
+  }
+
+  // ── RENDER RESULTS ────────────────────────────────────────────────────────────
+  function renderResults(r) {
+    const col = document.getElementById('outCol');
+
+    // Build decade probabilities rows
+    const topDecadeProb = Math.max(...DECADE_NAMES.map(d => r.decade_probs[d] || 0));
+    const decadeBars = DECADE_NAMES.map((d, i) => {
+      const prob = r.decade_probs[d] || 0;
+      const pct = Math.round(prob * 100);
+      const isTop = d === r.decade;
+      return `
+        <div class="bar-row">
+          <span class="bar-label ${isTop ? 'active' : ''}">${d}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${isTop ? 'var(--green)' : DECADE_COLORS[i]}"></div>
+          </div>
+          <span class="bar-pct ${isTop ? 'active' : ''}">${pct}%</span>
+        </div>`;
+    }).join('');
+
+    const topConf = Math.round((r.decade_probs[r.decade] || 0) * 100);
+
+    // Gauges
+    function gauge(label, value, color, display) {
+      const pct = Math.round(value * 100);
+      return `
+        <div class="gauge">
+          <div class="gauge-label">${label}</div>
+          <div class="gauge-track">
+            <div class="gauge-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <div class="gauge-val" style="color:${color}">${display}</div>
+        </div>`;
+    }
+
+    // Word scores — tri-color: green (high) / amber (mid) / dim (low)
+    const wordScores = r.word_scores || [];
+    const hasScores = wordScores.some(w => w.score > 0);
+    let wordHtml = '';
+    if (hasScores) {
+      wordHtml = wordScores.map(w => {
+        const s = w.score;
+        let bg, col, fw;
+        if (s > 0.65) {
+          bg = 'rgba(29,185,84,0.30)'; col = '#1DB954'; fw = '600';
+        } else if (s > 0.35) {
+          bg = 'rgba(245,158,11,0.25)'; col = '#F59E0B'; fw = '500';
+        } else {
+          bg = 'transparent'; col = 'var(--text-2)'; fw = '400';
+        }
+        return `<span class="w" style="background:${bg};color:${col};font-weight:${fw};border-radius:3px;padding:1px 3px" title="attention: ${s.toFixed(3)}">${escHtml(w.word)}</span>`;
+      }).join(' ');
+    } else {
+      wordHtml = `<span style="color:var(--text-dim);font-size:12px">Word scores unavailable</span>`;
+    }
+
+    // Warnings
+    let warningsHtml = '';
+    if (r.warnings && r.warnings.length > 0) {
+      warningsHtml = `
+        <div class="out-card">
+          <div class="out-label">Notes</div>
+          <div class="warnings-list">
+            ${r.warnings.map(w => `<div class="warning-item"><i class="ti ti-alert-triangle" style="font-size:11px;flex-shrink:0;margin-top:2px"></i>${escHtml(w)}</div>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    const audioTag = r.audio_used
+      ? `<span style="font-size:11px;color:var(--green);font-family:var(--font-mono)">+ audio</span>`
+      : `<span style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono)">lyrics only</span>`;
+
+    col.innerHTML = `
+      <div class="out-card">
+        <div class="out-label" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Decade prediction</span>
+          ${audioTag}
+        </div>
+        <div class="conf-ring-wrap">
+          ${(() => {
+            const r2 = 22, cx = 28, cy = 28, stroke = 5;
+            const circ = 2 * Math.PI * r2;
+            const dash = (topConf / 100) * circ;
+            const decadeColor = DECADE_COLORS[DECADE_NAMES.indexOf(r.decade)] || '#1DB954';
+            return `<svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="${stroke}"/>
+              <circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="${decadeColor}" stroke-width="${stroke}"
+                stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ * 0.25}"
+                stroke-linecap="round" style="transition:stroke-dasharray .6s ease"/>
+              <text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${decadeColor}" font-family="Inter,sans-serif">${topConf}%</text>
+            </svg>`;
+          })()}
+          <div>
+            <div class="conf-ring-label" style="color:${DECADE_COLORS[DECADE_NAMES.indexOf(r.decade)] || '#1DB954'}">${r.decade}</div>
+            <div class="conf-ring-sub">${topConf >= 40 ? 'Strong match' : topConf >= 25 ? 'Likely match' : 'Uncertain — close between decades'}</div>
+          </div>
+        </div>
+        ${decadeBars}
+      </div>
+      <div class="out-card">
+        <div class="out-label">Predicted features</div>
+        <div class="gauge-grid">
+          ${gauge('Valence', r.valence, 'var(--green)', r.valence.toFixed(2))}
+          ${gauge('Energy', r.energy, '#1DB954', r.energy.toFixed(2))}
+          ${gauge('Danceability', r.danceability, 'var(--warning)', r.danceability.toFixed(2))}
+          ${gauge('Tempo', Math.min(r.tempo_bpm / 220, 1), 'var(--secondary)', r.tempo_bpm + '<span style="font-size:10px;font-weight:400"> BPM</span>')}
+        </div>
+      </div>
+      <div class="out-card">
+        <div class="out-label">Word attention — lyrics branch</div>
+        <div class="word-attention">${wordHtml}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <div style="height:4px;width:60px;background:linear-gradient(to right,var(--glass-3),var(--green));border-radius:2px"></div>
+          <span style="font-size:11px;color:var(--text-3)">low → high attention</span>
+        </div>
+      </div>
+      ${warningsHtml}
+    `;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── CHARTS ───────────────────────────────────────────────────────────────────
+  const gridCol = 'rgba(255,255,255,0.06)';
+  const tickCol = 'rgba(255,255,255,0.35)';
+
+  // Era Time Machine — real valence per decade from lyrics_dataset_final_with_audio.csv
+  new Chart(document.getElementById('eraChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'],
+      datasets: [{
+        label: 'Mean Valence',
+        data: [0.538, 0.562, 0.574, 0.572, 0.575, 0.554, 0.556],
+        borderColor: '#1DB954',
+        backgroundColor: 'rgba(29,185,84,0.15)',
+        pointBackgroundColor: ['#8B5CF6','#6366F1','#3B82F6','#06B6D4','#10B981','#F59E0B','#EF4444'],
+        pointRadius: 7, pointHoverRadius: 9,
+        borderWidth: 2, fill: true, tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` Valence: ${ctx.raw} (${ctx.raw > 0.565 ? '😊 happier' : ctx.raw < 0.555 ? '😔 more melancholic' : '😐 neutral'})`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridCol }, ticks: { color: tickCol } },
+        y: {
+          min: 0.50, max: 0.62,
+          grid: { color: gridCol },
+          ticks: { color: tickCol, callback: v => v.toFixed(2) },
+          title: { display: true, text: 'Mean Valence (0=sad, 1=happy)', color: tickCol, font: { size: 10 } }
+        }
+      }
+    }
+  });
+
+  // Ablation bar chart (real numbers)
+  new Chart(document.getElementById('ablationChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'],
+      datasets: [
+        {
+          label: 'Multimodal accuracy per decade',
+          data: [66, 54, 36, 28, 57, 24, 51],
+          backgroundColor: ['#8B5CF6','#6366F1','#3B82F6','#06B6D4','#10B981','#F59E0B','#EF4444'].map(c => c + 'BB'),
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: tickCol, font: { size: 11 } } },
+        tooltip: {
+          mode: 'index', intersect: false,
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` }
+        },
+        annotation: {
+          annotations: {
+            chance: {
+              type: 'line', yMin: 14.3, yMax: 14.3,
+              borderColor: 'rgba(167,139,250,0.7)', borderWidth: 1.5,
+              borderDash: [4,4],
+              label: { content: 'Random chance 14.3%', display: true, color: tickCol, font: { size: 10 } }
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 11 } } },
+        y: {
+          min: 0, max: 100,
+          grid: { color: gridCol },
+          ticks: { color: tickCol, font: { size: 11 }, callback: v => v + '%' },
+          title: { display: true, text: 'Accuracy per decade (test set, n=200 each)', color: tickCol, font: { size: 10 } }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
