@@ -1278,7 +1278,7 @@ Every moment worth its gold`
         <div class="bar-row">
           <span class="bar-label ${isTop ? 'active' : ''}">${d}</span>
           <div class="bar-track">
-            <div class="bar-fill" style="width:${pct}%;background:${isTop ? '#1DB954' : DECADE_COLORS[i]}"></div>
+            <div class="bar-fill" style="width:${pct}%;background:${DECADE_COLORS[i]};${isTop ? 'filter:brightness(1.15)' : ''}"></div>
           </div>
           <span class="bar-pct ${isTop ? 'active' : ''}">${pct}%</span>
         </div>`;
