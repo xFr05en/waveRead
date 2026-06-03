@@ -1,7 +1,7 @@
 ---
 title: WaveRead
 emoji: 🎵
-colorFrom: teal
+colorFrom: blue
 colorTo: green
 sdk: docker
 pinned: false
