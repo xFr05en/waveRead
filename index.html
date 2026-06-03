@@ -1071,6 +1071,7 @@ Every moment worth its gold`
         const statusText = document.getElementById('recStatusText');
         status.className = 'rec-status done';
         statusText.innerHTML = `<i class="ti ti-check" style="font-size:10px"></i> ${formatTime(recordingSecs)} recorded
+          <button class="rec-clear-btn" onclick="playRecording()" title="Play recording">▶</button>
           <button class="rec-clear-btn" onclick="clearRecording()" title="Remove recording">✕</button>`;
       };
 
@@ -1110,6 +1111,14 @@ Every moment worth its gold`
       text.textContent = 'Record';
       timer.classList.remove('active');
     }
+  }
+
+  function playRecording() {
+    if (!recordedBlob) return;
+    const url = URL.createObjectURL(recordedBlob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.play();
   }
 
   function clearRecording() {
