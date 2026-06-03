@@ -883,14 +883,6 @@
             <td><span class="mono">0.567</span></td>
             <td><span class="mono">0.162</span></td>
           </tr>
-          <tr>
-            <td><span class="model-name">Audio-only (Librosa MLP)</span></td>
-            <td><span class="mono">audio features</span></td>
-            <td><span class="mono">42.7%</span></td>
-            <td><span class="mono">0.121</span></td>
-            <td><span class="mono">0.743</span></td>
-            <td><span class="mono">0.891</span></td>
-          </tr>
           <tr class="winner">
             <td><span class="model-name">Multimodal — waveRead</span></td>
             <td><span class="mono">lyrics + audio</span></td>
@@ -902,7 +894,7 @@
         </tbody>
       </table>
     </div>
-    <p style="font-size:12px;color:var(--text-3);margin-top:12px">Evaluated on held-out test set (n=30, 3-class decade subset for head-to-head comparison; n=1,400 for 7-class full accuracy). Audio-only result uses the learned null embedding for the text branch. Gains shown vs. text-only baseline. Adjacent decades (e.g. 1980s/1990s) are the hardest to distinguish — musical style evolves continuously across decade boundaries.</p>
+    <p style="font-size:12px;color:var(--text-3);margin-top:12px">Head-to-head comparison on held-out test set (n=30, 3-class: 1990s/2000s/2010s). Full 7-class evaluation (n=1,400): multimodal 45.3%, text-only ~26%. Gains shown vs. text-only RoBERTa baseline. Adjacent decades (e.g. 1980s/1990s) are the hardest to distinguish — musical style evolves continuously across decade boundaries.</p>
   </section>
 
   <!-- RESEARCH -->
