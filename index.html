@@ -84,11 +84,17 @@
 
     body {
       font-family: var(--font-sans);
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 55% 40% at 10% 15%, rgba(255,107,107,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 90% 25%, rgba(78,205,196,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 60%, rgba(255,217,61,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 35% 30% at 80% 85%, rgba(199,125,255,0.09) 0%, transparent 60%);
+      background-attachment: fixed;
       color: var(--text);
       font-size: 16px;
       line-height: 1.6;
-      transition: background 0.3s ease, color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
@@ -187,15 +193,7 @@
       position: relative;
       overflow: hidden;
     }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 50% 40% at 20% 50%, rgba(255,107,107,0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 35% at 80% 40%, rgba(78,205,196,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 30% 30% at 50% 80%, rgba(255,217,61,0.08) 0%, transparent 60%);
-      pointer-events: none;
-    }
+    .hero::before { display: none; }
 
     .hero-kicker {
       display: inline-flex; align-items: center; gap: 8px;
