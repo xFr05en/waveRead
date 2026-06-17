@@ -1166,37 +1166,6 @@ But now you're in my way`
       mediaRecorder.start(250); // collect chunks every 250ms
       setRecordingUI(true);
 
-      // ── Speech-to-text (fills lyrics textarea while recording) ──
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRec) {
-        const recognizer = new SpeechRec();
-        speechRecognizer = recognizer;
-        recognizer.continuous = true;
-        recognizer.interimResults = true;
-        recognizer.lang = 'en-US';
-        let finalTranscript = '';
-        recognizer.onresult = e => {
-          let interim = '';
-          for (let i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
-            else interim = e.results[i][0].transcript;
-          }
-          document.getElementById('lyricsInput').value = finalTranscript + interim;
-        };
-        recognizer.onerror = (e) => {
-          if (e.error === 'no-speech') return; // normal silence, ignore
-          console.warn('Speech recognition error:', e.error);
-        };
-        recognizer.onend = () => {
-          const ta = document.getElementById('lyricsInput');
-          if (finalTranscript.trim()) ta.value = finalTranscript.trim();
-          document.getElementById('speechStatus').classList.remove('visible');
-          if (speechRecognizer === recognizer) speechRecognizer = null;
-        };
-        recognizer.start();
-        document.getElementById('speechStatus').classList.add('visible');
-      }
-
       recordingTimer = setInterval(() => {
         recordingSecs++;
         document.getElementById('recTimer').textContent = formatTime(recordingSecs);
@@ -1211,12 +1180,6 @@ But now you're in my way`
   function stopRecordingClean() {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
-    }
-    if (speechRecognizer) {
-      const sr = speechRecognizer;
-      speechRecognizer = null; // prevent double-stop if called again before onend fires
-      setTimeout(() => { try { sr.stop(); } catch(e){} }, 1500);
-      // speechStatus is hidden by the recognizer's onend handler after it finalizes
     }
     clearInterval(recordingTimer);
     recordingTimer = null;
