@@ -1559,8 +1559,9 @@ But now you're in my way`
   }
 
   // ── CHARTS ───────────────────────────────────────────────────────────────────
-  const gridCol = 'rgba(255,255,255,0.06)';
-  const tickCol = 'rgba(255,255,255,0.35)';
+  const isDarkMode = () => document.body.classList.contains('dark');
+  const gridCol = () => isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+  const tickCol = () => isDarkMode() ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
 
   // Era Time Machine — real valence per decade from lyrics_dataset_final_with_audio.csv
   new Chart(document.getElementById('eraChart').getContext('2d'), {
@@ -1588,12 +1589,12 @@ But now you're in my way`
         }
       },
       scales: {
-        x: { grid: { color: gridCol }, ticks: { color: tickCol } },
+        x: { grid: { color: gridCol() }, ticks: { color: tickCol() } },
         y: {
           min: 0.50, max: 0.62,
-          grid: { color: gridCol },
-          ticks: { color: tickCol, callback: v => v.toFixed(2) },
-          title: { display: true, text: 'Mean Valence (0=sad, 1=happy)', color: tickCol, font: { size: 10 } }
+          grid: { color: gridCol() },
+          ticks: { color: tickCol(), callback: v => v.toFixed(2) },
+          title: { display: true, text: 'Mean Valence (0=sad, 1=happy)', color: tickCol(), font: { size: 10 } }
         }
       }
     }
@@ -1622,7 +1623,7 @@ But now you're in my way`
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: tickCol, font: { size: 11 } } },
+        legend: { display: false },
         tooltip: {
           mode: 'index', intersect: false,
           callbacks: { label: ctx => ctx.datasetIndex === 0 ? ` Decade acc: ${ctx.raw}%` : ` Valence r: ${(ctx.raw/100).toFixed(3)}` }
@@ -1639,12 +1640,12 @@ But now you're in my way`
         }
       },
       scales: {
-        x: { grid: { color: gridCol }, ticks: { color: tickCol, font: { size: 11 } } },
+        x: { grid: { color: gridCol() }, ticks: { color: tickCol(), font: { size: 11 } } },
         y: {
           min: 0, max: 100,
-          grid: { color: gridCol },
-          ticks: { color: tickCol, font: { size: 11 }, callback: v => v + '%' },
-          title: { display: true, text: 'Accuracy per decade (test set, n=200 each)', color: tickCol, font: { size: 10 } }
+          grid: { color: gridCol() },
+          ticks: { color: tickCol(), font: { size: 11 }, callback: v => v + '%' },
+          title: { display: true, text: 'Accuracy (%)', color: tickCol(), font: { size: 10 } }
         }
       }
     }
