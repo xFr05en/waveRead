@@ -675,6 +675,18 @@
     .tech-name { font-size: 13px; font-weight: 800; margin-bottom: 3px; color: var(--text); transition: color .2s; }
     .tech-role { font-size: 10px; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; transition: color .2s; }
 
+    /* ── MOOD QUADRANT ───────────────────────────────────────────────────── */
+    .mood-quadrant-wrap {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .mood-quadrant-wrap svg { max-width: 100%; }
+    .mood-label {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 900; letter-spacing: -.02em;
+      margin-top: 10px;
+    }
+    .mood-sub { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+
     /* ── FOOTER ──────────────────────────────────────────────────────────── */
     footer {
       padding: 64px 0;
@@ -744,10 +756,10 @@
       <a href="#research" class="btn btn-ghost"><i class="ti ti-chart-line"></i> View findings</a>
     </div>
     <div class="stat-strip">
-      <div class="stat-cell"><div class="stat-num">14,000</div><div class="stat-label">Songs</div></div>
-      <div class="stat-cell"><div class="stat-num">7</div><div class="stat-label">Decades</div></div>
-      <div class="stat-cell"><div class="stat-num">2</div><div class="stat-label">Modalities</div></div>
-      <div class="stat-cell"><div class="stat-num">5</div><div class="stat-label">Predictions</div></div>
+      <div class="stat-cell"><div class="stat-num">45.3%</div><div class="stat-label">Decade Accuracy</div></div>
+      <div class="stat-cell"><div class="stat-num">0.963</div><div class="stat-label">Tempo Pearson r</div></div>
+      <div class="stat-cell"><div class="stat-num">3×</div><div class="stat-label">Above Random</div></div>
+      <div class="stat-cell"><div class="stat-num">6,000+</div><div class="stat-label">Songs Trained</div></div>
     </div>
   </section>
 
@@ -1479,6 +1491,7 @@ But now you're in my way`
           ${gauge('Tempo', Math.min(r.tempo_bpm / 220, 1), '#4ECDC4', r.tempo_bpm + '<span style="font-size:10px;font-weight:400"> BPM</span>')}
         </div>
       </div>
+      ${moodQuadrant(r.valence, r.energy)}
       <div class="out-card">
         <div class="out-label">Word attention — lyrics branch</div>
         <div class="word-attention">${wordHtml}</div>
@@ -1489,6 +1502,58 @@ But now you're in my way`
       </div>
       ${warningsHtml}
     `;
+  }
+
+  // ── MOOD QUADRANT (Russell circumplex) ───────────────────────────────────────
+  function moodQuadrant(valence, energy) {
+    const S = 180, P = 22, T = S + P * 2;
+    const dx = P + valence * S;
+    const dy = P + (1 - energy) * S;
+
+    let mood, mc;
+    if      (valence >= 0.5 && energy >= 0.5) { mood = 'Excited';     mc = '#F59E0B'; }
+    else if (valence <  0.5 && energy >= 0.5) { mood = 'Tense';       mc = '#EF4444'; }
+    else if (valence >= 0.5 && energy <  0.5) { mood = 'Peaceful';    mc = '#1DB954'; }
+    else                                       { mood = 'Melancholic'; mc = '#6366F1'; }
+
+    return `
+      <div class="out-card">
+        <div class="out-label">Mood quadrant — Russell circumplex model</div>
+        <div class="mood-quadrant-wrap">
+          <svg width="${T}" height="${T}" viewBox="0 0 ${T} ${T}">
+            <!-- quadrant fills -->
+            <rect x="${P}" y="${P}" width="${S/2}" height="${S/2}" fill="rgba(239,68,68,0.07)" rx="3"/>
+            <rect x="${P+S/2}" y="${P}" width="${S/2}" height="${S/2}" fill="rgba(245,158,11,0.07)" rx="3"/>
+            <rect x="${P}" y="${P+S/2}" width="${S/2}" height="${S/2}" fill="rgba(99,102,241,0.07)" rx="3"/>
+            <rect x="${P+S/2}" y="${P+S/2}" width="${S/2}" height="${S/2}" fill="rgba(29,185,84,0.07)" rx="3"/>
+            <!-- border -->
+            <rect x="${P}" y="${P}" width="${S}" height="${S}" fill="none" stroke="var(--border-2)" stroke-width="1.5" rx="5"/>
+            <!-- centre lines -->
+            <line x1="${P+S/2}" y1="${P}" x2="${P+S/2}" y2="${P+S}" stroke="var(--border-2)" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <line x1="${P}" y1="${P+S/2}" x2="${P+S}" y2="${P+S/2}" stroke="var(--border-2)" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <!-- axis labels -->
+            <text x="${P+S/2}" y="${P-7}" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter,sans-serif" font-weight="700" letter-spacing=".08em">ENERGETIC</text>
+            <text x="${P+S/2}" y="${P+S+15}" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter,sans-serif" font-weight="700" letter-spacing=".08em">CALM</text>
+            <text x="${P-7}" y="${P+S/2}" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter,sans-serif" font-weight="700" letter-spacing=".08em" transform="rotate(-90,${P-7},${P+S/2})">NEGATIVE</text>
+            <text x="${P+S+7}" y="${P+S/2}" text-anchor="middle" font-size="8" fill="var(--text-3)" font-family="Inter,sans-serif" font-weight="700" letter-spacing=".08em" transform="rotate(90,${P+S+7},${P+S/2})">POSITIVE</text>
+            <!-- quadrant names -->
+            <text x="${P+7}" y="${P+14}" font-size="9" fill="rgba(239,68,68,0.55)" font-family="Inter,sans-serif" font-weight="700">Tense</text>
+            <text x="${P+S-7}" y="${P+14}" text-anchor="end" font-size="9" fill="rgba(245,158,11,0.55)" font-family="Inter,sans-serif" font-weight="700">Excited</text>
+            <text x="${P+7}" y="${P+S-7}" font-size="9" fill="rgba(99,102,241,0.55)" font-family="Inter,sans-serif" font-weight="700">Sad</text>
+            <text x="${P+S-7}" y="${P+S-7}" text-anchor="end" font-size="9" fill="rgba(29,185,84,0.55)" font-family="Inter,sans-serif" font-weight="700">Peaceful</text>
+            <!-- crosshairs from dot -->
+            <line x1="${dx}" y1="${P}" x2="${dx}" y2="${P+S}" stroke="${mc}" stroke-width="1" opacity="0.25" stroke-dasharray="2,4"/>
+            <line x1="${P}" y1="${dy}" x2="${P+S}" y2="${dy}" stroke="${mc}" stroke-width="1" opacity="0.25" stroke-dasharray="2,4"/>
+            <!-- glow rings -->
+            <circle cx="${dx}" cy="${dy}" r="14" fill="${mc}" opacity="0.10"/>
+            <circle cx="${dx}" cy="${dy}" r="9"  fill="${mc}" opacity="0.20"/>
+            <!-- dot -->
+            <circle cx="${dx}" cy="${dy}" r="6" fill="${mc}" stroke="var(--surface)" stroke-width="2.5"/>
+          </svg>
+          <div class="mood-label" style="color:${mc}">${mood}</div>
+          <div class="mood-sub">Valence ${valence.toFixed(2)} &nbsp;·&nbsp; Energy ${energy.toFixed(2)}</div>
+        </div>
+      </div>`;
   }
 
   function escHtml(str) {
