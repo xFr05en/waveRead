@@ -1003,7 +1003,7 @@
     <p class="section-sub">7-class decade classification on 1,400 held-out songs. Rows = actual decade, columns = predicted. The diagonal is correct predictions. Errors cluster exclusively in adjacent decades — the model never confuses the 1960s with the 2010s.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
       <div class="chart-card" style="padding:0;overflow:hidden">
-        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/confusion_matrix.png" style="width:100%;display:block;border-radius:16px" alt="Confusion matrix">
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/689ca5c/plots/confusion_matrix.png" style="width:100%;display:block;border-radius:16px" alt="Confusion matrix">
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="finding" style="border-left-color:#1DB954">
@@ -1030,11 +1030,11 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
       <div class="chart-card" style="padding:0;overflow:hidden">
         <div class="chart-title" style="padding:16px 20px 0">Overfit run — before regularization</div>
-        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/overfitting_curves.png" style="width:100%;display:block" alt="Overfitting curves">
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/689ca5c/plots/overfitting_curves.png" style="width:100%;display:block" alt="Overfitting curves">
       </div>
       <div class="chart-card" style="padding:0;overflow:hidden">
         <div class="chart-title" style="padding:16px 20px 0">Final model — 30 epochs with regularization</div>
-        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/training_curves.png" style="width:100%;display:block" alt="Training curves">
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/689ca5c/plots/training_curves.png" style="width:100%;display:block" alt="Training curves">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
@@ -1059,7 +1059,7 @@
     <h2>What words the model focused on</h2>
     <p class="section-sub">Top attended words per decade extracted from the final-layer CLS token gradients. Stopwords removed, minimum 25 occurrences. The vocabulary shift across decades is a direct readout of what the model learned is temporally diagnostic.</p>
     <div class="chart-card" style="padding:0;overflow:hidden">
-      <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/attention_words_by_decade.png" style="width:100%;display:block;border-radius:16px" alt="Top attended words by decade">
+      <img src="https://raw.githubusercontent.com/xFr05en/waveRead/689ca5c/plots/attention_words_by_decade.png" style="width:100%;display:block;border-radius:16px" alt="Top attended words by decade">
     </div>
   </section>
 
