@@ -63,6 +63,8 @@ app = FastAPI(
 )
 
 # Allow all origins so the static website (GitHub Pages / Vercel) can call this
+app.mount("/plots", StaticFiles(directory="plots"), name="plots")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

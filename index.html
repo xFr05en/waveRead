@@ -995,6 +995,74 @@
     </div>
   </section>
 
+
+  <!-- CONFUSION MATRIX -->
+  <section class="section" id="confusion">
+    <div class="section-kicker">Model evaluation</div>
+    <h2>Where the model gets it right — and wrong</h2>
+    <p class="section-sub">7-class decade classification on 1,400 held-out songs. Rows = actual decade, columns = predicted. The diagonal is correct predictions. Errors cluster exclusively in adjacent decades — the model never confuses the 1960s with the 2010s.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+      <div class="chart-card" style="padding:0;overflow:hidden">
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/confusion_matrix.png" style="width:100%;display:block;border-radius:16px" alt="Confusion matrix">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="finding" style="border-left-color:#1DB954">
+          <h4>1960s easiest to identify (66% recall)</h4>
+          <p>Distinctive romantic soul vocabulary — "baby", "love", "darling" — combined with high-energy acoustic signatures makes the 1960s the most recognizable decade in the dataset.</p>
+        </div>
+        <div class="finding" style="border-left-color:#3B82F6">
+          <h4>1990s hardest (28% recall)</h4>
+          <p>The 1990s sit between two stylistically dominant decades. Grunge, Alt-Rock, and early hip-hop overlap heavily in lyrical and acoustic space with both the 1980s and 2000s.</p>
+        </div>
+        <div class="finding" style="border-left-color:#F59E0B">
+          <h4>No decade is ever confused with a non-adjacent one</h4>
+          <p>Every misclassification lands in a neighbouring decade. The model has learned a continuous temporal axis, not just arbitrary cluster labels. Getting the era right even when the decade is wrong is a meaningful result.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAINING DYNAMICS -->
+  <section class="section" id="training">
+    <div class="section-kicker">Training dynamics</div>
+    <h2>What happened during training</h2>
+    <p class="section-sub">Two training runs: the overfit baseline (all 12 RoBERTa layers unfrozen, no regularization) and the final regularized model. The sigma panel on the right shows homoscedastic uncertainty weights learning automatically — no manual tuning required.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+      <div class="chart-card" style="padding:0;overflow:hidden">
+        <div class="chart-title" style="padding:16px 20px 0">Overfit run — before regularization</div>
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/overfitting_curves.png" style="width:100%;display:block" alt="Overfitting curves">
+      </div>
+      <div class="chart-card" style="padding:0;overflow:hidden">
+        <div class="chart-title" style="padding:16px 20px 0">Final model — 30 epochs with regularization</div>
+        <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/training_curves.png" style="width:100%;display:block" alt="Training curves">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div class="finding" style="border-left-color:#EF4444">
+        <h4>Loss went negative</h4>
+        <p>Under homoscedastic uncertainty weighting, total loss crosses zero around epoch 5. This is mathematically expected — the log(σ) penalty terms go negative as task uncertainty decreases — not a bug.</p>
+      </div>
+      <div class="finding" style="border-left-color:#8B5CF6">
+        <h4>Decade σ stayed high (~1.2)</h4>
+        <p>The model correctly identified decade classification as the hardest task and kept its uncertainty weight high throughout training, preventing it from dominating the gradient signal.</p>
+      </div>
+      <div class="finding" style="border-left-color:#10B981">
+        <h4>Regression σ collapsed to floor</h4>
+        <p>Valence, energy, and danceability σ values hit the 0.3 clamp floor by epoch 5 — the model became maximally confident on these tasks. Tempo settled mid-range (~0.4), reflecting its moderate difficulty.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ATTENTION WORDS -->
+  <section class="section" id="attention">
+    <div class="section-kicker">Interpretability</div>
+    <h2>What words the model focused on</h2>
+    <p class="section-sub">Top attended words per decade extracted from the final-layer CLS token gradients. Stopwords removed, minimum 25 occurrences. The vocabulary shift across decades is a direct readout of what the model learned is temporally diagnostic.</p>
+    <div class="chart-card" style="padding:0;overflow:hidden">
+      <img src="https://raw.githubusercontent.com/xFr05en/waveRead/main/plots/attention_words_by_decade.png" style="width:100%;display:block;border-radius:16px" alt="Top attended words by decade">
+    </div>
+  </section>
+
   <!-- ERA TIME MACHINE -->
   <section class="section" id="era">
     <div class="section-kicker">Research finding</div>
