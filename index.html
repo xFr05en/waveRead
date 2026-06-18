@@ -1129,6 +1129,7 @@ But now you're in my way`
   let recordedBlob  = null;
   let recordingTimer = null;
   let recordingSecs  = 0;
+  let playbackAudio  = null;
   const MAX_RECORD_SECS = 120;
 
   async function toggleRecording() {
@@ -1164,7 +1165,7 @@ But now you're in my way`
         const statusText = document.getElementById('recStatusText');
         status.className = 'rec-status done';
         statusText.innerHTML = `<i class="ti ti-check" style="font-size:10px"></i> ${formatTime(recordingSecs)} recorded
-          <button class="rec-clear-btn" onclick="playRecording()" title="Play recording">▶</button>
+          <button class="rec-clear-btn" id="playbackBtn" onclick="playRecording()" title="Play recording">▶</button>
           <button class="rec-clear-btn" onclick="clearRecording()" title="Remove recording">✕</button>`;
       };
 
@@ -1207,14 +1208,30 @@ But now you're in my way`
 
   function playRecording() {
     if (!recordedBlob) return;
+    const btn = document.getElementById('playbackBtn');
+
+    // If already playing, stop it
+    if (playbackAudio) {
+      playbackAudio.pause();
+      playbackAudio = null;
+      if (btn) btn.textContent = '▶';
+      return;
+    }
+
     const url = URL.createObjectURL(recordedBlob);
-    const audio = new Audio(url);
-    audio.onended = () => URL.revokeObjectURL(url);
-    audio.play();
+    playbackAudio = new Audio(url);
+    if (btn) btn.textContent = '■';
+    playbackAudio.onended = () => {
+      URL.revokeObjectURL(url);
+      playbackAudio = null;
+      if (btn) btn.textContent = '▶';
+    };
+    playbackAudio.play();
   }
 
   function clearRecording() {
     stopRecordingClean();
+    if (playbackAudio) { playbackAudio.pause(); playbackAudio = null; }
     recordedBlob = null;
     audioChunks  = [];
     recordingSecs = 0;
