@@ -19,13 +19,13 @@ WaveRead takes a song's lyrics and an optional audio clip and returns five predi
 
 ## How it works
 
-WaveRead is a dual-branch model trained on ~4,000 songs:
+WaveRead is a dual-branch model trained on 14,000 songs:
 
 - **Text branch** — fine-tuned RoBERTa (`roberta-base`) encodes lyrics and extracts attention weights for word highlighting
 - **Audio branch** — a 3-layer MLP processes 20 Librosa features (MFCCs, spectral centroid, zero-crossing rate, RMS energy, tempo)
 - **Fusion** — both branches are combined via homoscedastic uncertainty weighting (Kendall et al., 2018), letting the model automatically down-weight the noisier modality at inference time
 
-The decade classifier outputs a probability distribution across six decades (1960s–2010s). Continuous outputs (valence, energy, danceability, tempo) are regression heads trained jointly with the decade classifier.
+The decade classifier outputs a probability distribution across seven decades (1960s–2020s). Continuous outputs (valence, energy, danceability, tempo) are regression heads trained jointly with the decade classifier.
 
 ---
 
@@ -54,7 +54,7 @@ The decade classifier outputs a probability distribution across six decades (196
 
 ## Dataset
 
-Lyrics scraped from Genius across six decades (1960s–2010s), audio clips sourced from YouTube. ~4,000 songs total after filtering. Audio features extracted with Librosa at 22,050 Hz.
+Lyrics scraped from Genius across seven decades (1960s–2020s), audio clips sourced from YouTube. 14,000 songs total (2,000 per decade) after filtering. Audio features extracted with Librosa at 22,050 Hz.
 
 ---
 
