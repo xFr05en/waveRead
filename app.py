@@ -27,7 +27,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from inference import LyricsPredictor
@@ -61,9 +60,6 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
-
-# Allow all origins so the static website (GitHub Pages / Vercel) can call this
-app.mount("/plots", StaticFiles(directory="plots"), name="plots")
 
 app.add_middleware(
     CORSMiddleware,
